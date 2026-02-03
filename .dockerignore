@@ -1,0 +1,30 @@
+# Git and IDE
+.git
+.gitignore
+.idea
+.vscode
+*.md
+Doc.md
+
+# Environment and secrets (pass at runtime)
+.env
+.env.*
+
+# Database and data
+*.db
+data.db
+*.csv
+
+# Scripts and generated artifacts
+generate_leads.go
+generate_leads.js
+
+# Test and coverage
+*_test.go
+coverage.out
+coverage.html
+test/
+
+# Misc
+Makefile
+postman_collection.json
