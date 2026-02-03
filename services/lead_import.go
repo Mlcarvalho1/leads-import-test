@@ -4,64 +4,86 @@ import (
 	"encoding/csv"
 	"io"
 	"strings"
+
 	"your-app/database"
 	"your-app/models"
 )
 
-// ImportLeadsFromCSV reads a CSV from r and bulk-inserts leads.
-// Expected CSV columns: name, email, phone (header optional; order: name, email, phone)
-func ImportLeadsFromCSV(r io.Reader) (imported int, err error) {
+const BatchSize = 100
+
+func isHeaderRow(row []string) bool {
+	if len(row) == 0 {
+		return false
+	}
+	first := strings.ToLower(strings.TrimSpace(row[0]))
+	return first == "name" || first == "nome" || first == "email"
+}
+
+func ImportLeadsFromCSV(r io.Reader) (int, error) {
 	reader := csv.NewReader(r)
 	reader.TrimLeadingSpace = true
 	reader.FieldsPerRecord = -1
 
-	rows, err := reader.ReadAll()
-	if err != nil {
-		return 0, err
-	}
+	db := database.GetDB()
 
-	if len(rows) == 0 {
-		return 0, nil
-	}
+	imported := 0
+	batch := make([]models.Lead, 0, BatchSize)
 
-	// Skip header if it looks like a header (first cell is "name" or "nome" etc)
-	start := 0
-	if len(rows) > 0 {
-		first := strings.ToLower(strings.TrimSpace(rows[0][0]))
-		if first == "name" || first == "nome" || first == "email" {
-			start = 1
+	isFirstRow := true
+
+	for {
+		row, err := reader.Read()
+		if err == io.EOF {
+			break
 		}
-	}
+		if err != nil {
+			return imported, err
+		}
 
-	var leads []models.Lead
-	for i := start; i < len(rows); i++ {
-		row := rows[i]
+		if isFirstRow && isHeaderRow(row) {
+			isFirstRow = false
+			continue
+		}
+		isFirstRow = false
+
 		if len(row) < 2 {
 			continue
 		}
+
 		name := strings.TrimSpace(row[0])
 		email := strings.TrimSpace(row[1])
 		phone := ""
 		if len(row) > 2 {
 			phone = strings.TrimSpace(row[2])
 		}
+
 		if name == "" && email == "" {
 			continue
 		}
-		leads = append(leads, models.Lead{
+
+		batch = append(batch, models.Lead{
 			Name:   name,
 			Email:  email,
 			Phone:  phone,
 			Source: "csv_import",
 		})
+
+		if len(batch) >= BatchSize {
+			if err := db.CreateInBatches(batch, BatchSize).Error; err != nil {
+				return imported, err
+			}
+			imported += len(batch)
+			batch = batch[:0] // reutiliza memória
+		}
 	}
 
-	if len(leads) == 0 {
-		return 0, nil
+	// flush final
+	if len(batch) > 0 {
+		if err := db.CreateInBatches(batch, BatchSize).Error; err != nil {
+			return imported, err
+		}
+		imported += len(batch)
 	}
 
-	if err := database.GetDB().CreateInBatches(leads, 100).Error; err != nil {
-		return 0, err
-	}
-	return len(leads), nil
+	return imported, nil
 }
