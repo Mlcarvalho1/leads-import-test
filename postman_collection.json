@@ -1,0 +1,53 @@
+{
+	"info": {
+		"_postman_id": "golang-fiber-base",
+		"name": "Golang Fiber Base API",
+		"description": "Collection for testing the API (health + lead import)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000"
+		}
+	],
+	"item": [
+		{
+			"name": "Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/health",
+					"host": ["{{baseUrl}}"],
+					"path": ["health"]
+				},
+				"description": "Check API health."
+			}
+		},
+		{
+			"name": "Import Leads (CSV)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": [],
+							"description": "CSV file with columns: name, email, phone (header row optional)"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/leads/import",
+					"host": ["{{baseUrl}}"],
+					"path": ["leads", "import"]
+				},
+				"description": "Upload a CSV file to import leads. Use form field 'file'. CSV format: name, email, phone (first row can be header: name, nome, or email)."
+			}
+		}
+	]
+}
