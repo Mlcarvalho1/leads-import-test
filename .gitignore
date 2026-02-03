@@ -1,0 +1,49 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/api
+/cmd/api/api
+
+# Test binary and coverage
+*.test
+coverage.out
+coverage.html
+
+# Go workspace
+go.work
+vendor/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+data.db
+
+# Generated / data files (optional: remove if you want to track CSVs)
+# leads_*.csv
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build output
+/dist
+/build
+bin/
+
+# Logs
+*.log
+logs/
