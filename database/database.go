@@ -6,7 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
-	"your-app/models"
+
+	"leads-import/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -68,11 +69,25 @@ func GetDB() *gorm.DB {
 
 		log.Printf("connected to %s", driver)
 		db.Logger = logger.Default.LogMode(logger.Info)
-		log.Println("running migrations")
 
-		if err := db.AutoMigrate(&models.Lead{}); err != nil {
-			log.Fatal("Failed to run migrations: ", err)
+		if driver == "postgres" {
+			db.Exec("CREATE SCHEMA IF NOT EXISTS amigocare")
 		}
+
+		if err := db.AutoMigrate(
+			&models.Lead{},
+			&models.LeadImport{},
+			&models.LeadSource{},
+			&models.LeadChannel{},
+			&models.Tag{},
+			&models.ChatTag{},
+			&models.Patient{},
+			&models.MessagingAccount{},
+		); err != nil {
+			log.Fatal("Failed to auto-migrate: ", err)
+		}
+		log.Println("auto-migration completed")
+
 		instance = db
 	})
 	return instance

@@ -15,7 +15,7 @@ A clean and well-structured Go API template following Go best practices and conv
 
 ## 📋 Prerequisites
 
-- Go 1.23.5 or higher
+- Go 1.25 or higher
 - PostgreSQL database
 - Basic understanding of Go programming
 
@@ -152,7 +152,7 @@ func TestYourFeature(t *testing.T) {
 
 ## 🛠️ Dependencies
 
-- [Fiber v2](https://github.com/gofiber/fiber) - Fast HTTP framework
+- [Fiber v3](https://github.com/gofiber/fiber) - Fast HTTP framework
 - [GORM](https://gorm.io/) - ORM for database operations
 - [godotenv](https://github.com/joho/godotenv) - Environment variable loader
 - [testify](https://github.com/stretchr/testify) - Testing utilities

@@ -3,11 +3,11 @@ package main
 import (
 	"log"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"github.com/joho/godotenv"
 
-	"your-app/database"
-	"your-app/routes"
+	"leads-import/database"
+	"leads-import/routes"
 )
 
 func init() {
@@ -19,6 +19,7 @@ func init() {
 func main() {
 	app := fiber.New()
 	database.ConnectDb()
+	database.ConnectMongo()
 
 	routes.SetupRoutes(app)
 

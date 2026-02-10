@@ -8,10 +8,10 @@ import (
 	"os"
 	"testing"
 
-	"your-app/database"
-	"your-app/routes"
+	"leads-import/database"
+	"leads-import/routes"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 // SetupTestEnv sets up the test environment variables (SQLite)
@@ -62,12 +62,18 @@ func MakeRequest(t *testing.T, app *fiber.App, method, path string, body interfa
 	req := httptest.NewRequest(method, path, bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := app.Test(req)
+	resp, err := app.Test(req, fiber.TestConfig{Timeout: 0, FailOnTimeout: false})
 	if err != nil {
 		t.Fatalf("Failed to make request: %v", err)
 	}
 
 	return resp
+}
+
+// TestRequest runs app.Test with a no-timeout config. Use for custom requests (e.g. multipart).
+func TestRequest(t *testing.T, app *fiber.App, req *http.Request) (*http.Response, error) {
+	t.Helper()
+	return app.Test(req, fiber.TestConfig{Timeout: 0, FailOnTimeout: false})
 }
 
 // ParseResponseBody parses the response body into the given interface

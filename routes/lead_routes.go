@@ -1,12 +1,11 @@
 package routes
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"your-app/handlers"
+	"leads-import/handlers"
+
+	"github.com/gofiber/fiber/v3"
 )
 
-// RegisterLeadRoutes registers lead-related routes
 func RegisterLeadRoutes(api fiber.Router) {
-	leads := api.Group("/leads")
-	leads.Post("/import", handlers.ImportLeads)
+	api.Post("/import", handlers.ImportLeads)
 }
